@@ -1,7 +1,7 @@
 import sys
-from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QListWidgetItem
 from ui_lecteur_video import Ui_MainWindow
-from PySide2.QtCore import QUrl, QTime
+from PySide2.QtCore import QUrl, QTime, QFileInfo
 from PySide2.QtMultimedia import QMediaPlayer, QMediaContent
 
 class MainWindow(QMainWindow):
@@ -12,20 +12,16 @@ class MainWindow(QMainWindow):
         self.ui.pblecture.clicked.connect(self.lectureClicked)
         self.ui.pbpause.clicked.connect(self.pauseClicked)
         self.ui.pbstop.clicked.connect(self.stopClicked)
-
-        self.ui.pbmoins.clicked.connect(self.moinsClicked)
-        self.ui.pbplus.clicked.connect(self.plusClicked)
-
+        self.ui.pbmoins.clicked.connect(self.supprMedia)
+        self.ui.pbplus.clicked.connect(self.ajouterMedia)
+        self.ui.pbprecedent.clicked.connect(self.precedentClicked)
+        self.ui.pbsuivant.clicked.connect(self.suivantClicked)
         self.mediaPlayer = QMediaPlayer() #creation de la variable mediaPlayer
         self.mediaPlayer.setVideoOutput(self.ui.ecran) #on projette la var mediaPlayer sur ecran.
-
         self.ui.dialVolume.valueChanged.connect(self.volumeChanged)
-        #self.ui.dialVolume.valueChanged.connect(self.ui.lcdVol.display)
-
         self.mediaPlayer.durationChanged.connect(self.mediaDurationChanged)
         self.mediaPlayer.positionChanged.connect(self.mediaPositionChanged)
-
-     #   self.ui.timeline.valueChanged.connect(self.slideChanged)
+        self.ui.listWidget.itemDoubleClicked.connect(self.mediaSelected)
 
         # Commande qui permet de lancer le film (depuis le début)
         mediaContent = QMediaContent(QUrl.fromLocalFile("big_buck_bunny.avi"))
@@ -34,6 +30,40 @@ class MainWindow(QMainWindow):
     #def slideChanged(self):
     #    self.mediaPlayer.position()
     #    self.ui.timeline.setValue()
+    def ajouterMedia(self):
+        nomMedia = QFileDialog.getOpenFileName(self,"ChoixFilm", "c:/Users/AELION/PycharmProjects/lect_video", "(*.avi *.mp4)")
+        fInfo = QFileInfo(nomMedia[0])
+        fShortName = fInfo.baseName()
+        item = QListWidgetItem(fShortName)
+        item.setToolTip(nomMedia[0])
+        self.ui.listWidget.addItem(item)
+
+    def suivantClicked(self):
+        currentItemRow = self.ui.listWidget.currentRow()
+        if currentItemRow == -1:
+            return
+        totalItems = self.ui.listWidget.count()
+        self.ui.listWidget.setCurrentRow((currentItemRow+1)%totalItems)
+        self.mediaSelected()
+
+    def precedentClicked(self):
+        currentItemRow = self.ui.listWidget.currentRow()
+        if currentItemRow == -1:
+            return
+        totalItems = self.ui.listWidget.count()
+        self.ui.listWidget.setCurrentRow((currentItemRow - 1) % totalItems)
+        self.mediaSelected()
+
+    def supprMedia(self):
+        rowItem = self.ui.listWidget.currentRow()
+        if rowItem != -1:  #au cas ou on appuie sur Supp et qu'il n'y a pas d'objet
+            self.ui.listWidget.takeItem(rowItem)
+
+    def mediaSelected(self):
+        currentItem = self.ui.listWidget.currentItem()
+        mediaContent = QMediaContent(QUrl.fromLocalFile(currentItem.toolTip()))
+        self.mediaPlayer.setMedia(mediaContent)
+        self.lectureClicked()
 
     def mediaDurationChanged(self):
         self.ui.debut.setText("00:00:00")
@@ -69,10 +99,6 @@ class MainWindow(QMainWindow):
         print("Stop!!")
         self.mediaPlayer.stop()
 
-    def moinsClicked(self):
-        print("Enlève un fichier")
-    def plusClicked(self):
-        print("Ajoute un fichier")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

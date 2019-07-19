@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'lecteur_video.ui',
 # licensing of 'lecteur_video.ui' applies.
 #
-# Created: Thu Jul 18 17:35:49 2019
+# Created: Fri Jul 19 11:44:17 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -126,9 +126,14 @@ class Ui_MainWindow(object):
         self.dialVolume = QtWidgets.QDial(self.centralwidget)
         self.dialVolume.setMaximumSize(QtCore.QSize(80, 80))
         self.dialVolume.setMaximum(100)
+        self.dialVolume.setProperty("value", 100)
         self.dialVolume.setObjectName("dialVolume")
         self.horizontalLayout_4.addWidget(self.dialVolume)
         self.labelVol = QtWidgets.QLabel(self.centralwidget)
+        self.labelVol.setMinimumSize(QtCore.QSize(50, 0))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.labelVol.setFont(font)
         self.labelVol.setObjectName("labelVol")
         self.horizontalLayout_4.addWidget(self.labelVol)
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
@@ -158,6 +163,6 @@ class Ui_MainWindow(object):
         self.pbplus.setText(QtWidgets.QApplication.translate("MainWindow", "+", None, -1))
         self.pbmoins.setText(QtWidgets.QApplication.translate("MainWindow", "-", None, -1))
         self.label_3.setText(QtWidgets.QApplication.translate("MainWindow", "Volume:", None, -1))
-        self.labelVol.setText(QtWidgets.QApplication.translate("MainWindow", "TextLabel", None, -1))
+        self.labelVol.setText(QtWidgets.QApplication.translate("MainWindow", "100%", None, -1))
 
 from PySide2.QtMultimediaWidgets import QVideoWidget
